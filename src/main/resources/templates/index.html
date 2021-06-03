@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Solid Spring Demo</title>
+</head>
+<body>
+<h1>Welcome!</h1>
+
+<p th:text="'Hello, ' + ${name}"!></p>
+
+<p><a href="/logout">Logout</a> of your account.</p>
+
+<h2>Update your name</h2>
+<form method="POST" th:action="@{/update}">
+    <input type="text" th:name="new_name"/>
+    <input type="submit"/>
+</form>
+</body>
+</html>
