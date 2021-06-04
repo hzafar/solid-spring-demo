@@ -28,7 +28,7 @@ class SecurityConfiguration(
 
         http.logout().logoutUrl("/logout")
             .logoutSuccessUrl("/login")
-            .deleteCookies("JSESSIONID")
+            .deleteCookies("JSESSIONID", "nssidp.sid")
             .clearAuthentication(true)
             .invalidateHttpSession(true)
     }

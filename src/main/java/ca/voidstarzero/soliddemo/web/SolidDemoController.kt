@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -33,8 +34,10 @@ class SolidDemoController(
     {
         val authToken = authToken(authentication)
         val profileURI = authentication.name.removeSuffix("#me")
+        val sessionId = ((authentication as OAuth2AuthenticationToken)
+            .details as WebAuthenticationDetails).sessionId
 
-        val profileResponse = doGetRequest(authToken, profileURI)
+        val profileResponse = doGetRequest(authToken, sessionId, profileURI)
         val profileGraph = ModelFactory.createDefaultModel()
             .read(
                 IOUtils.toInputStream(profileResponse, "UTF-8"),
@@ -59,9 +62,11 @@ class SolidDemoController(
     {
         val authToken = authToken(authentication)
         val profileSubject = authentication.name
+        val sessionId = ((authentication as OAuth2AuthenticationToken)
+            .details as WebAuthenticationDetails).sessionId
 
         val profileURI = profileSubject.removeSuffix("#me")
-        val profileResponse = doGetRequest(authToken, profileURI)
+        val profileResponse = doGetRequest(authToken, sessionId, profileURI)
         val profileGraph = ModelFactory.createDefaultModel()
             .read(
                 IOUtils.toInputStream(profileResponse, "UTF-8"),
@@ -77,7 +82,7 @@ class SolidDemoController(
             """DELETE DATA {<${profileSubject}> <${FOAF.name}> "$oldName".};""" +
                     """INSERT DATA {<${profileSubject}> <${FOAF.name}> "$newName".};"""
 
-        doSparqlUpdate(authToken, profileSubject.removeSuffix("#me"), query)
+        doSparqlUpdate(authToken, sessionId, profileSubject.removeSuffix("#me"), query)
 
         return "update"
     }
@@ -97,22 +102,27 @@ class SolidDemoController(
 
     private fun authHeaders(
         authToken: String,
+        sessionId: String,
         method: String,
         requestURI: String
     ): HttpHeaders
     {
         val headers = HttpHeaders()
         headers.add("Authorization", "DPoP $authToken")
-        headers.add("DPoP", dpopUtils.dpopJWT(method, requestURI))
+        dpopUtils.sessionKey(sessionId)?.let { key ->
+            headers.add("DPoP", dpopUtils.dpopJWT(method, requestURI, key))
+        }
+
         return headers
     }
 
     private fun doGetRequest(
         authToken: String,
+        sessionId: String,
         requestURI: String
     ): String
     {
-        val headers = authHeaders(authToken, "GET", requestURI)
+        val headers = authHeaders(authToken, sessionId,"GET", requestURI)
         val httpEntity = HttpEntity<String>(headers)
         return try
         {
@@ -129,11 +139,12 @@ class SolidDemoController(
 
     private fun doSparqlUpdate(
         authToken: String,
+        sessionId: String,
         requestURI: String,
         query: String
     )
     {
-        val headers = authHeaders(authToken, "PATCH", requestURI)
+        val headers = authHeaders(authToken, sessionId, "PATCH",  requestURI)
         headers.add("Content-Type", "application/sparql-update")
         val httpEntity = HttpEntity<String>(query, headers)
 

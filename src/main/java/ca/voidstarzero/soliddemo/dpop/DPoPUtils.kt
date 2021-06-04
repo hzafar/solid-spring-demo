@@ -10,14 +10,26 @@ import com.nimbusds.jwt.SignedJWT
 import java.time.Instant
 import java.util.*
 
-class DPoPUtils(private val key: ECKey)
+class DPoPUtils
 {
-    fun dpopJWT(method: String, targetURI: String): String =
-        signedJWT(header(), payload(method, targetURI))
+    private val sessionKeyMap: MutableMap<String, ECKey> = mutableMapOf()
 
-    private fun signedJWT(header: JWSHeader, payload: JWTClaimsSet): String {
+    fun sessionKey(sessionId: String): ECKey? = sessionKeyMap[sessionId]
+
+    fun saveSessionKey(sessionId: String, key: ECKey) {
+        sessionKeyMap[sessionId] = key
+    }
+
+    fun removeSessionKey(sessionId: String) {
+        sessionKeyMap.remove(sessionId)
+    }
+
+    fun dpopJWT(method: String, targetURI: String, sessionKey: ECKey): String =
+        signedJWT(header(sessionKey), payload(method, targetURI), sessionKey)
+
+    private fun signedJWT(header: JWSHeader, payload: JWTClaimsSet, sessionKey: ECKey): String {
         val signedJWT = SignedJWT(header, payload)
-        signedJWT.sign(ECDSASigner(key.toECPrivateKey()))
+        signedJWT.sign(ECDSASigner(sessionKey.toECPrivateKey()))
         return signedJWT.serialize()
     }
 
@@ -29,9 +41,9 @@ class DPoPUtils(private val key: ECKey)
             .claim("htu", targetURI)
             .build()
 
-    private fun header(): JWSHeader =
+    private fun header(sessionKey: ECKey): JWSHeader =
         JWSHeader.Builder(JWSAlgorithm.ES256)
             .type(JOSEObjectType("dpop+jwt"))
-            .jwk(key.toPublicJWK())
+            .jwk(sessionKey.toPublicJWK())
             .build();
 }

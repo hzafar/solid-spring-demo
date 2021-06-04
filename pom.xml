@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ca.voidstarzero</groupId>
-    <artifactId>solid-demo</artifactId>
+    <artifactId>solid-spring-demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>solid-demo</name>
+    <name>solid-spring-demo</name>
     <description>Demo Solid project for Spring Boot</description>
     <properties>
         <java.version>11</java.version>
