@@ -3,9 +3,11 @@ package ca.voidstarzero.soliddemo.config
 import ca.voidstarzero.soliddemo.dpop.DPoPUtils
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.security.web.authentication.WebAuthenticationDetails
+import org.springframework.stereotype.Component
 import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
 
+@Component
 class KeyRemovalSessionListener(private val dPoPUtils: DPoPUtils) : HttpSessionListener
 {
     override fun sessionDestroyed(se: HttpSessionEvent)

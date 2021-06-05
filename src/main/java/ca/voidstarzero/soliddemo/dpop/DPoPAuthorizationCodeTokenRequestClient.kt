@@ -13,11 +13,13 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResp
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
+import org.springframework.stereotype.Component
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.context.request.RequestContextHolder
 import java.util.*
 
+@Component
 class DPoPAuthorizationCodeTokenRequestClient(
     private val dpopUtils: DPoPUtils,
     private val restTemplate: RestTemplate
