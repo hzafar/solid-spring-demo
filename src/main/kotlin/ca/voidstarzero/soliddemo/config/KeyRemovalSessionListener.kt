@@ -12,9 +12,9 @@ class KeyRemovalSessionListener(private val dPoPUtils: DPoPUtils) : HttpSessionL
 {
     override fun sessionDestroyed(se: HttpSessionEvent)
     {
-        val sessionId = ((se.session.getAttribute("SPRING_SECURITY_CONTEXT") as SecurityContextImpl)
-            .authentication.details as WebAuthenticationDetails).sessionId
+        val sessionId = ((se.session.getAttribute("SPRING_SECURITY_CONTEXT") as? SecurityContextImpl)
+            ?.authentication?.details as? WebAuthenticationDetails)?.sessionId
 
-        dPoPUtils.removeSessionKey(sessionId)
+        sessionId?.let { dPoPUtils.removeSessionKey(it) }
     }
 }

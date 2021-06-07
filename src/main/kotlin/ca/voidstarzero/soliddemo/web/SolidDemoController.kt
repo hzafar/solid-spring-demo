@@ -28,7 +28,7 @@ class SolidDemoController(
     ): String
     {
         val authToken = authToken(authentication)
-        val profileURI = authentication.name.removeSuffix("#me") // FIXME lol
+        val profileURI = authentication.name.replace("#.*$".toRegex(), "")
         val sessionId = ((authentication as OAuth2AuthenticationToken)
             .details as WebAuthenticationDetails).sessionId
 
