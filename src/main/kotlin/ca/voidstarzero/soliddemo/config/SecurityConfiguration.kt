@@ -15,9 +15,11 @@ class SecurityConfiguration(
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(web: WebSecurity?) {
-        http.authorizeRequests().anyRequest().authenticated()
+        http.authorizeRequests()
+            .antMatchers("/solid-login", "/solid-login/**").permitAll()
+            .anyRequest().authenticated()
             .and()
-            .oauth2Login()
+            .oauth2Login().loginPage("/solid-login")
             .and()
             .oauth2Client()
     }
@@ -26,8 +28,8 @@ class SecurityConfiguration(
         http.oauth2Login().tokenEndpoint()
             .accessTokenResponseClient(tokenResponseClient)
 
-        http.logout().logoutUrl("/logout")
-            .logoutSuccessUrl("/login")
+        http.logout()
+            .logoutUrl("/logout")
             .deleteCookies("JSESSIONID")
             .clearAuthentication(true)
             .invalidateHttpSession(true)

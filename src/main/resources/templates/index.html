@@ -11,10 +11,19 @@
 <h2>Update your name</h2>
 <form method="POST" th:action="@{/update}">
     <input type="text" th:name="new_name"/>
-    <input type="submit"/>
+    <input type="submit" value="Submit"/>
 </form>
 
-<p>[<a href="/logout">Logout</a>]</p>
+<h2>Access a protected resource</h2>
+<form method="POST" th:action="@{/get-resource}">
+    <input type="text" size="75" th:name="resource_uri"/>
+    <input type="submit" value="Submit"/>
+</form>
+
+<form name="logoutForm" th:hidden="true" method="post" th:action="@{/logout}">
+    <input type="submit" value="Logout" />
+</form>
+[<a href="javascript: logoutForm.submit();">Logout</a>]
 
 </body>
 </html>

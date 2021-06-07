@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Solid Spring Demo</title>
+</head>
+<body>
+<h1>Login</h1>
+<p>Enter your webID or your identity provider:</p>
+<form method="POST" th:action="@{/solid-login/solid-oidc}">
+  <input type="text" size="75" th:name="uri"/>
+  <input type="submit" value="Submit"/>
+</form>
+</body>
+</html>
